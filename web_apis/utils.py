@@ -1,6 +1,18 @@
+import html2text
 import requests
 
 from web_apis.constants import BASE_URL
+
+
+def transform_product(product):
+    product['title'] = product['title']['rendered']
+    product['content'] = html2text.html2text(product['content']['rendered'])
+    product['excerpt'] = html2text.html2text(product['excerpt']['rendered'])
+
+    url = f"{BASE_URL}media/{product['featured_media']}"
+    response = make_request(url)
+    product['featured_media'] = response
+    product['image_url'] = product['featured_media']
 
 
 def make_request(url):
@@ -12,9 +24,14 @@ def make_request(url):
 
 def get_dashboard():
     products_url = f'{BASE_URL}product'
-    return make_request(products_url)
+    data = make_request(products_url)
+    for product in data:
+        transform_product(product)
+    return data
 
 
-def get_products(product_id):
+def get_product(product_id):
     product_url = f'{BASE_URL}product/{product_id}'
-    return make_request(product_url)
+    data = make_request(product_url)
+    transform_product(data)
+    return data

@@ -3,11 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from web_apis.utils import get_dashboard, get_products
-
-
-def make_response():
-    pass
+from web_apis.utils import get_dashboard, get_product
 
 
 class Dashboard(APIView):
@@ -24,7 +20,7 @@ class Product(APIView):
         product_id = request.GET.get('product_id')
 
         try:
-            data = get_products(product_id)
+            data = get_product(product_id)
             return Response(data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
