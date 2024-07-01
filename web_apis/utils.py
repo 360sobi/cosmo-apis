@@ -11,8 +11,7 @@ def transform_product(product):
 
     url = f"{BASE_URL}media/{product['featured_media']}"
     response = make_request(url)
-    product['featured_media'] = response
-    product['image_url'] = product['featured_media']
+    product['image_url'] = response['guid']['rendered']
 
 
 def make_request(url):
