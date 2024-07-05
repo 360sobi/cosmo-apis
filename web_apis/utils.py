@@ -1,36 +1,45 @@
 import html2text
 import requests
+from django.conf import settings
+from requests.auth import HTTPBasicAuth
 
 from web_apis.constants import BASE_URL
 
 
 def transform_product(product):
-    product['title'] = product['title']['rendered']
-    product['content'] = html2text.html2text(product['content']['rendered'])
-    product['excerpt'] = html2text.html2text(product['excerpt']['rendered'])
-
-    url = f"{BASE_URL}media/{product['featured_media']}"
-    response = make_request(url)
-    product['image_url'] = response['guid']['rendered']
+    product['description'] = html2text.html2text(product['description'])
+    product['short_description'] = html2text.html2text(product['short_description'])
 
 
 def make_request(url):
-    response = requests.get(url)
+    response = requests.get(url, auth=HTTPBasicAuth(settings.WC_CONSUMER_KEY, settings.WC_CONSUMER_SECRET))
     response.raise_for_status()
     data = response.json()
     return data
 
 
-def get_dashboard():
-    products_url = f'{BASE_URL}product'
-    data = make_request(products_url)
-    for product in data:
-        transform_product(product)
+def get_transformed_url(url, **q_params):
+    if q_params:
+        url = f'{url}?'
+        url += '&'.join([f'{q_param}={q_params[q_param][0]}' for q_param in q_params.keys()])
+
+    return url
+
+
+def get_dashboard(**q_params):
+    url = get_transformed_url(f'{BASE_URL}products', **q_params)
+    data = make_request(url)
+    [transform_product(product) for product in data]
     return data
 
 
 def get_product(product_id):
-    product_url = f'{BASE_URL}product/{product_id}'
-    data = make_request(product_url)
+    url = f'{BASE_URL}products/{product_id}'
+    data = make_request(url)
     transform_product(data)
     return data
+
+
+def get_category(**q_params):
+    url = get_transformed_url(f'{BASE_URL}products/categories', **q_params)
+    return make_request(url)
