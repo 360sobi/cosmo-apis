@@ -41,7 +41,13 @@ THIRD_PARTY_APPS = [
     'django_extensions',
 ]
 
+LOCAL_APPS = [
+    'web_apis',
+    'zoom_apis'
+]
+
 INSTALLED_APPS += THIRD_PARTY_APPS
+INSTALLED_APPS += LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -126,3 +132,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 WC_CONSUMER_KEY = env.get_value('WC_CONSUMER_KEY', default='')
 WC_CONSUMER_SECRET = env.get_value('WC_CONSUMER_SECRET', default='')
+
+# zoom variables
+ZOOM_CLIENT_ID = env.get_value('ZOOM_CLIENT_ID', default='')
+ZOOM_CLIENT_SECRET = env.get_value('ZOOM_CLIENT_SECRET', default='')
+ZOOM_REDIRECT_URI = env.get_value('ZOOM_REDIRECT_URI', default='')
