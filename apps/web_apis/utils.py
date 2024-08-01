@@ -3,7 +3,7 @@ import requests
 from django.conf import settings
 from requests.auth import HTTPBasicAuth
 
-from web_apis.constants import BASE_URL
+from apps.web_apis.constants import BASE_URL
 
 
 def transform_product(product):

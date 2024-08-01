@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ZoomApisConfig(AppConfig):
+class WebApisConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'zoom_apis'
+    name = 'apps.web_apis'

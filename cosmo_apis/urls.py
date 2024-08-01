@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include([
-        path('', include('web_apis.urls')),
-        path('zoom/', include('zoom_apis.urls'))
+        path('', include('apps.web_apis.urls')),
+        path('zoom/', include('apps.zoom_apis.urls'))
     ])),
 ]

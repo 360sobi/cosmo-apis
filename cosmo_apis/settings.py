@@ -42,8 +42,8 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'web_apis',
-    'zoom_apis'
+    'apps.web_apis',
+    'apps.zoom_apis'
 ]
 
 INSTALLED_APPS += THIRD_PARTY_APPS
