@@ -137,3 +137,5 @@ WC_CONSUMER_SECRET = env.get_value('WC_CONSUMER_SECRET', default='')
 ZOOM_CLIENT_ID = env.get_value('ZOOM_CLIENT_ID', default='')
 ZOOM_CLIENT_SECRET = env.get_value('ZOOM_CLIENT_SECRET', default='')
 ZOOM_REDIRECT_URI = env.get_value('ZOOM_REDIRECT_URI', default='')
+
+STRIPE_API_KEY = env.get_value('STRIPE_API_KEY', default='')

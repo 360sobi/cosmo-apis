@@ -1,3 +1,5 @@
+import base64
+
 import html2text
 import requests
 from django.conf import settings
@@ -14,8 +16,19 @@ def transform_product(product):
 def make_request(url):
     response = requests.get(url, auth=HTTPBasicAuth(settings.WC_CONSUMER_KEY, settings.WC_CONSUMER_SECRET))
     response.raise_for_status()
-    data = response.json()
-    return data
+    return response.json()
+
+
+def get_headers():
+    # Base64 encode the credentials
+    credentials = f"{settings.WC_CONSUMER_KEY}:{settings.WC_CONSUMER_SECRET}"
+    encoded_credentials = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
+
+    # Set up and return the headers
+    return {
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {encoded_credentials}"
+    }
 
 
 def get_transformed_url(url, **q_params):
@@ -43,3 +56,23 @@ def get_product(product_id):
 def get_category(**q_params):
     url = get_transformed_url(f'{BASE_URL}products/categories', **q_params)
     return make_request(url)
+
+
+def get_orders(**q_params):
+    url = get_transformed_url(f'{BASE_URL}orders', **q_params)
+    return make_request(url)
+
+
+def create_order(data):
+    url = get_transformed_url(f'{BASE_URL}orders')
+    response = requests.post(url, json=data, headers=get_headers())
+    response.raise_for_status()
+    return response.json()
+
+
+def complete_order(order_id):
+    url = f'{BASE_URL}orders/{order_id}'
+    complete_data = {"status": "completed"}
+    response = requests.post(url, json=complete_data, headers=get_headers())
+    response.raise_for_status()
+    return response.json()
