@@ -73,6 +73,6 @@ def create_order(data):
 def complete_order(order_id):
     url = f'{BASE_URL}orders/{order_id}'
     complete_data = {"status": "completed"}
-    response = requests.post(url, json=complete_data, headers=get_headers())
+    response = requests.put(url, json=complete_data, headers=get_headers())
     response.raise_for_status()
     return response.json()

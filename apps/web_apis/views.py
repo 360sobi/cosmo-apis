@@ -1,7 +1,7 @@
 import requests
 import stripe
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -71,12 +71,13 @@ class Order(APIView):
             }
             order_payload = {**request.data, **additional_payload}
             data = create_order(order_payload)
-            return Response(data, status=status.HTTP_200_OK)
+            response_data = {"order_id": data["id"], "payment_intent_id": data["meta_data"][0]["value"], "order_status": data["status"]}
+            return Response(response_data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@require_http_methods(["PUT"])
+@api_view(['PUT'])
 def complete_order_view(request):
     order_id = request.GET.get('order_id')
     try:
