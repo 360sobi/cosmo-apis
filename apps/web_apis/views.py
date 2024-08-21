@@ -65,7 +65,7 @@ class Order(APIView):
                 "meta_data": [
                     {
                         "key": "_stripe_payment_intent_id",
-                        "value": payment_intent.id
+                        "value": payment_intent.client_secret
                     }
                 ]
             }
