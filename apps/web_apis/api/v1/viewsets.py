@@ -6,15 +6,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from apps.web_apis.utils import get_dashboard, get_product, get_category, get_orders, create_order, complete_order
+from apps.web_apis.api.v1.cosmo_api import CosmoAPI
 
 stripe.api_key = settings.STRIPE_API_KEY
+
+cosmo_api = CosmoAPI()
 
 
 class Dashboard(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = get_dashboard(**request.GET)
+            data = cosmo_api.get_dashboard(**request.GET)
             return Response(data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -25,7 +27,7 @@ class Product(APIView):
         product_id = request.GET.get('product_id')
 
         try:
-            data = get_product(product_id)
+            data = cosmo_api.get_product(product_id)
             return Response(data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -34,7 +36,7 @@ class Product(APIView):
 class Category(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = get_category(**request.GET)
+            data = cosmo_api.get_category(**request.GET)
             return Response(data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -43,7 +45,7 @@ class Category(APIView):
 class Order(APIView):
     def get(self, request, *args, **kwargs):
         try:
-            data = get_orders(**request.GET)
+            data = cosmo_api.get_orders(**request.GET)
             return Response(data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -70,8 +72,9 @@ class Order(APIView):
                 ]
             }
             order_payload = {**request.data, **additional_payload}
-            data = create_order(order_payload)
-            response_data = {"order_id": data["id"], "payment_intent_id": data["meta_data"][0]["value"], "order_status": data["status"]}
+            data = cosmo_api.create_order(order_payload)
+            response_data = {"order_id": data["id"], "payment_intent_id": data["meta_data"][0]["value"],
+                             "order_status": data["status"]}
             return Response(response_data, status=status.HTTP_200_OK)
         except requests.exceptions.RequestException as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -81,8 +84,17 @@ class Order(APIView):
 def complete_order_view(request):
     order_id = request.GET.get('order_id')
     try:
-        data = complete_order(order_id)
+        data = cosmo_api.complete_order(order_id)
         return Response(data, status=status.HTTP_200_OK)
     except requests.exceptions.RequestException as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['DELETE'])
+def delete_order_view(request):
+    order_id = request.GET.get('order_id')
+    try:
+        data = cosmo_api.delete_order(order_id)
+        return Response(data, status=status.HTTP_200_OK)
+    except requests.exceptions.RequestException as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
