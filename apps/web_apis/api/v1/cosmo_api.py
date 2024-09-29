@@ -4,7 +4,7 @@ import requests
 from django.conf import settings
 from html2text import html2text
 
-from apps.web_apis.constants import BASE_URL
+from apps.web_apis.constants import *
 
 
 class CosmoAPI:
@@ -22,18 +22,18 @@ class CosmoAPI:
         }
 
     @staticmethod
-    def _get_transformed_url(endpoint, **q_params):
-        url = f'{BASE_URL}{endpoint}'
+    def _get_transformed_url(endpoint, base_url=WC_BASE_URL, **q_params):
+        url = f'{base_url}{endpoint}'
         if q_params:
             url = f'{url}?'
             url += '&'.join([f'{q_param}={q_params[q_param][0]}' for q_param in q_params.keys()])
 
         return url
 
-    def _make_request(self, endpoint, request_type, q_params=None, **kwargs):
+    def _make_request(self, endpoint, request_type, base_url=WC_BASE_URL, q_params=None, **kwargs):
         if q_params is None:
             q_params = {}
-        url = self._get_transformed_url(endpoint, **q_params)
+        url = self._get_transformed_url(endpoint, base_url, **q_params)
         method_map = {
             "GET": requests.get,
             "POST": requests.post,
@@ -49,6 +49,13 @@ class CosmoAPI:
     def _transform_product(product):
         product['description'] = html2text(product['description'])
         product['short_description'] = html2text(product['short_description'])
+
+    @staticmethod
+    def _transform_store(store):
+        store['vendor_description'] = html2text(store['vendor_description'])
+        store['vendor_policies']['shipping_policy'] = html2text(store['vendor_policies']['shipping_policy'])
+        store['vendor_policies']['refund_policy'] = html2text(store['vendor_policies']['refund_policy'])
+        store['vendor_policies']['cancellation_policy'] = html2text(store['vendor_policies']['cancellation_policy'])
 
     def get_dashboard(self, **q_params):
         data = self._make_request('products', "GET", q_params)
@@ -75,3 +82,18 @@ class CosmoAPI:
 
     def delete_order(self, order_id):
         return self._make_request(f'orders/{order_id}', "DELETE")
+
+    def get_stores(self, **q_params):
+        data = self._make_request('store-vendors', "GET", base_url=WCFMMP_BASE_URL, q_params=q_params)
+        [self._transform_store(store) for store in data]
+        return data
+
+    def get_store(self, store_id):
+        data = self._make_request(f'store-vendors/{store_id}', "GET", base_url=WCFMMP_BASE_URL)
+        self._transform_store(data)
+        return data
+
+    def get_store_products(self, store_id):
+        data = self._make_request(f'store-vendors/{store_id}/products', "GET", base_url=WCFMMP_BASE_URL)
+        [self._transform_product(product) for product in data]
+        return data

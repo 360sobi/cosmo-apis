@@ -98,3 +98,32 @@ def delete_order_view(request):
         return Response(data, status=status.HTTP_200_OK)
     except requests.exceptions.RequestException as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Stores(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            data = cosmo_api.get_stores(**request.GET)
+            return Response(data, status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Store(APIView):
+    def get(self, request, *args, **kwargs):
+        store_id = request.GET.get('store_id')
+        try:
+            data = cosmo_api.get_store(store_id)
+            return Response(data, status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StoreProducts(APIView):
+    def get(self, request, *args, **kwargs):
+        store_id = request.GET.get('store_id')
+        try:
+            data = cosmo_api.get_store_products(store_id)
+            return Response(data, status=status.HTTP_200_OK)
+        except requests.exceptions.RequestException as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
