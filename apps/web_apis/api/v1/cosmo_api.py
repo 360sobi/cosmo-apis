@@ -33,7 +33,7 @@ class CosmoAPI:
     def _make_request(self, endpoint, request_type, base_url=WC_BASE_URL, q_params=None, **kwargs):
         if q_params is None:
             q_params = {}
-        url = self._get_transformed_url(endpoint, base_url, **q_params)
+        url = self._get_transformed_url(endpoint, base_url=base_url, **q_params)
         method_map = {
             "GET": requests.get,
             "POST": requests.post,
@@ -58,7 +58,7 @@ class CosmoAPI:
         store['vendor_policies']['cancellation_policy'] = html2text(store['vendor_policies']['cancellation_policy'])
 
     def get_dashboard(self, **q_params):
-        data = self._make_request('products', "GET", q_params)
+        data = self._make_request('products', "GET", q_params=q_params)
         [self._transform_product(product) for product in data]
         return data
 
@@ -68,10 +68,10 @@ class CosmoAPI:
         return data
 
     def get_category(self, **q_params):
-        return self._make_request('products/categories', "GET", q_params)
+        return self._make_request('products/categories', "GET", q_params=q_params)
 
     def get_orders(self, **q_params):
-        return self._make_request('orders', "GET", q_params)
+        return self._make_request('orders', "GET", q_params=q_params)
 
     def create_order(self, data):
         return self._make_request('orders', "POST", json=data)
